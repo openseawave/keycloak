@@ -3,18 +3,17 @@
 namespace OpenSeaWave\Keycloak;
 
 use OpenSeaWave\Keycloak\Representation\AddUserRolesRequest;
+use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
 use OpenSeaWave\Keycloak\Representation\CreateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\DeleteUserRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetUsersRequest;
 use OpenSeaWave\Keycloak\Representation\UpdateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\UserRepresentation;
-use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
 
 /**
  * Interface KeycloakInterface
  *
- * @package OpenSeaWave\Keycloak
  * @author  Omar Haris
  */
 interface KeycloakInterface
@@ -62,17 +61,17 @@ interface KeycloakInterface
     /**
      * Count the total number of users in a realm.
      */
-    public function countUsers(?string $realm = null,?CountUsersRequest $query = null): int;
+    public function countUsers(?string $realm = null, ?CountUsersRequest $query = null): int;
 
     /**
      * Retrieve a list of users from Keycloak.
      */
-    public function getUsers(?string $realm = null,?GetUsersRequest $query = null): array;
+    public function getUsers(?string $realm = null, ?GetUsersRequest $query = null): array;
 
     /**
      * Retrieve a specific user by their ID.
      */
-    public function getUser(string $id,?string $realm = null): object;
+    public function getUser(string $id, ?string $realm = null): object;
 
     /**
      * Create a new user in Keycloak.
@@ -87,12 +86,12 @@ interface KeycloakInterface
     /**
      * Delete a user from Keycloak.
      */
-    public function deleteUser(string $id,?string $realm = null): bool;
+    public function deleteUser(string $id, ?string $realm = null): bool;
 
     /**
      * Retrieve a list of roles from the realm.
      */
-    public function getRoles(?GetRolesRequest $request,?string $realm = null): array;
+    public function getRoles(?GetRolesRequest $request, ?string $realm = null): array;
 
     /**
      * Create a new role in the realm.
@@ -107,12 +106,12 @@ interface KeycloakInterface
     /**
      * Delete a role from the realm.
      */
-    public function deleteRole(string $roleName,?string $realm = null): void;
+    public function deleteRole(string $roleName, ?string $realm = null): void;
 
     /**
      * Retrieve roles assigned to a specific user.
      */
-    public function getUserRoles(string $userId,?string $realm = null): array;
+    public function getUserRoles(string $userId, ?string $realm = null): array;
 
     /**
      * Assign roles to a user.
@@ -127,10 +126,10 @@ interface KeycloakInterface
     /**
      * Change user password.
      */
-    public function changeUserPassword(string $userId, string $password,?string $realm = null): void;
+    public function changeUserPassword(string $userId, string $password, ?string $realm = null): void;
 
     /**
      * Change user activation status.
      */
-    public function changeUserActivationStatus(string $userId, bool $enabled,?string $realm = null): void;
+    public function changeUserActivationStatus(string $userId, bool $enabled, ?string $realm = null): void;
 }
