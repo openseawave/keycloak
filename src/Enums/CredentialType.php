@@ -5,7 +5,6 @@ namespace OpenSeaWave\Keycloak\Enums;
 /**
  * CredentialType enum class.
  *
- * @package OpenSeaWave\Keycloak\Enums
  * @author  Omar Haris
  */
 enum CredentialType: string
