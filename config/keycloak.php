@@ -14,7 +14,7 @@ return [
     | Keycloak instance is accessible.
     |
     */
-    'base_url' => env('KEYCLOAK_BASE_URL'),
+    'base_url' => env('KEYCLOAK_BASE_URL','http://localhost:8080'),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ return [
     | the Keycloak API.
     |
     */
-    'username' => env('KEYCLOAK_USERNAME'),
+    'username' => env('KEYCLOAK_USERNAME','admin'),
 
     /*
     |--------------------------------------------------------------------------

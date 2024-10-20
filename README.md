@@ -29,9 +29,11 @@ you can use it like this:
 use Openseawave\Keycloak\Keycloak;
 
 $keycloak = new Keycloak(
-    baseUrl: 'http://localhost:8080/auth',
+    baseUrl: 'http://localhost:8080',
     username: 'admin',
     password: 'admin',
+    grantType: 'password',
+    clientId: 'admin-cli',
 );
 
 $keycloak->getUsers();
