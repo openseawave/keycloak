@@ -5,11 +5,10 @@ namespace OpenSeaWave\Keycloak\Representation;
 /**
  * Class GetRolesRequest
  *
- * @package OpenSeaWave\Keycloak\Representation
  * @author  Omar Haris
  */
-class GetRolesRequest extends Representation {
-
+class GetRolesRequest extends Representation
+{
     /*
      * GetRolesRequest constructor.
      *
@@ -23,5 +22,5 @@ class GetRolesRequest extends Representation {
         public ?int $first = null,
         public ?int $max = null,
         public ?string $search = null,
-    ){}
+    ) {}
 }

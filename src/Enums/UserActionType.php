@@ -5,7 +5,6 @@ namespace OpenSeaWave\Keycloak\Enums;
 /**
  * UserActionType enum class.
  *
- * @package OpenSeaWave\Keycloak\Enums
  * @author  Omar Haris
  */
 enum UserActionType: string
