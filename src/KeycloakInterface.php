@@ -75,6 +75,11 @@ interface KeycloakInterface
     public function getUser(string $id,?string $realm = null): object;
 
     /**
+     * Retrieve a specific user by their username.
+     */
+    public function getUserByUsername(string $username,?string $realm = null): object;
+
+    /**
      * Create a new user in Keycloak.
      */
     public function createUser(UserRepresentation $data, ?string $realm = null): UserRepresentation;

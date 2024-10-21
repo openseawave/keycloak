@@ -321,6 +321,33 @@ class Keycloak implements KeycloakInterface
     }
 
     /**
+     * Retrieve user details by username.
+     *
+     * @param string $username The username of the user to retrieve.
+     * @param ?string $realm The realm for which to retrieve the user.
+     * @return object A user representation.
+     * @throws GuzzleException|KeycloakException If the HTTP request fails.
+     */
+    public function getUserByUsername(string $username,?string $realm = null): object
+    {
+        // Retrieve the user by username
+        $users = $this->getUsers(
+            realm: $realm,
+            query: new GetUsersRequest(
+                username: $username
+            )
+        );
+
+        // Throw an exception if the user is not found
+        if(count($users) === 0) {
+            throw new KeycloakException('User not found', 0);
+        }
+
+        // Return the user object
+        return $users[0];
+    }
+
+    /**
      * Create a new user in the realm.
      *
      * @param UserRepresentation $data The user data for creating a new user.

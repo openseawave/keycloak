@@ -24,7 +24,8 @@ use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
  * @method static object getToken(?string $realm) Retrieve an access token from Keycloak.
  * @method static int countUsers(?string $realm,?CountUsersRequest $query) Count the total number of users in a realm.
  * @method static array getUsers(?string $realm,?GetUsersRequest $query) Retrieve a list of users from Keycloak.
- * @method static array getUser(string $id,?string $realm) Retrieve a specific user by their ID.
+ * @method static object getUser(string $id,?string $realm) Retrieve a specific user by their ID.
+ * @method static object getUserByUsername(string $username,?string $realm) Retrieve a specific user by their username.
  * @method static UserRepresentation createUser(UserRepresentation $data, ?string $realm,) Create a new user in Keycloak.
  * @method static UserRepresentation updateUser(string $id, UserRepresentation $data, ?string $realm) Update an existing user.
  * @method static bool deleteUser(string $id,?string $realm) Delete a user from Keycloak.
