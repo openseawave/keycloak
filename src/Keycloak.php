@@ -29,22 +29,22 @@ class Keycloak implements KeycloakInterface
     /**
      * The base URL for Keycloak.
      */
-    private string $baseUrl;
+    public string $baseUrl;
 
     /**
      * The username for the keycloak admin.
      */
-    private ?string $username;
+    public ?string $username;
 
     /**
      * The password for the keycloak admin.
      */
-    private ?string $password;
+    public ?string $password;
 
     /**
      * The realm for which requests are made.
      */
-    private ?string $realm;
+    public ?string $realm;
 
     /**
      * The client ID.
@@ -358,7 +358,7 @@ class Keycloak implements KeycloakInterface
             throw new KeycloakException('Failed to create user', 0);
         }
 
-        return $data;
+        return $response;
     }
 
     /**
