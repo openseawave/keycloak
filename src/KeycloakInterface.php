@@ -2,11 +2,13 @@
 
 namespace OpenSeaWave\Keycloak;
 
+use OpenSeaWave\Keycloak\Enums\GrantType;
 use OpenSeaWave\Keycloak\Representation\AddUserRolesRequest;
 use OpenSeaWave\Keycloak\Representation\CreateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\DeleteUserRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetUsersRequest;
+use OpenSeaWave\Keycloak\Representation\RoleRepresentation;
 use OpenSeaWave\Keycloak\Representation\UpdateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\UserRepresentation;
 use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
@@ -52,7 +54,7 @@ interface KeycloakInterface
     /**
      * Set the grant type for Keycloak.
      */
-    public function setGrantType(string $grantType): Keycloak;
+    public function setGrantType(GrantType $grantType): Keycloak;
 
     /**
      * Retrieve a token from Keycloak.
@@ -72,7 +74,7 @@ interface KeycloakInterface
     /**
      * Retrieve a specific user by their ID.
      */
-    public function getUser(string $id,?string $realm = null): object;
+    public function getUser(string $id,?string $realm = null): UserRepresentation;
 
     /**
      * Retrieve a specific user by their username.
@@ -102,32 +104,32 @@ interface KeycloakInterface
     /**
      * Create a new role in the realm.
      */
-    public function createRole(CreateRoleRequest $data, ?string $realm = null): bool;
+    public function createRole(CreateRoleRequest $data, ?string $realm = null): RoleRepresentation;
 
     /**
      * Update an existing role.
      */
-    public function updateRole(string $roleName, UpdateRoleRequest $data, ?string $realm = null): void;
+    public function updateRole(string $roleName, UpdateRoleRequest $data, ?string $realm = null): bool;
 
     /**
      * Delete a role from the realm.
      */
-    public function deleteRole(string $roleName,?string $realm = null): void;
+    public function deleteRole(string $roleName,?string $realm = null): bool;
 
     /**
-     * Retrieve roles assigned to a specific user.
+     * Retrieve realm roles assigned to a specific user.
      */
-    public function getUserRoles(string $userId,?string $realm = null): array;
+    public function getUserRealmRoles(string $userId,?string $realm = null): array;
 
     /**
      * Assign roles to a user.
      */
-    public function addUserRoles(string $userId, AddUserRolesRequest $roles, ?string $realm = null): void;
+    public function addUserRealmRoles(string $userId, AddUserRolesRequest $roles, ?string $realm = null): object;
 
     /**
      * Remove roles from a user.
      */
-    public function deleteUserRoles(string $userId, DeleteUserRolesRequest $roles, ?string $realm = null): void;
+    public function deleteUserRealmRoles(string $userId, DeleteUserRolesRequest $roles, ?string $realm = null): bool;
 
     /**
      * Change user password.

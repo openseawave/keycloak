@@ -22,6 +22,11 @@ class UpdateRoleRequest extends Representation
      */
     public function __construct(
         /**
+         * @var string|null The ID of the role to update.
+         */
+        public ?string $id = null,
+
+        /**
          * @var string|null The new name of the role (optional).
          */
         public ?string $name = null,
@@ -40,5 +45,20 @@ class UpdateRoleRequest extends Representation
          * @var array|null A list of composite roles if this role is a composite (optional).
          */
         public ?array $composites = null,
+
+        /**
+         * @var bool|null Whether the role is a client role (optional).
+         */
+        public ?bool $clientRole = null,
+
+        /**
+         * @var string|null The ID of the client to which the role belongs (optional).
+         */
+        public ?string $containerId = null,
+
+        /**
+         * @var array|null A list of attributes for the role (optional).
+         */
+        public ?array $attributes = null,
     ){}
 }

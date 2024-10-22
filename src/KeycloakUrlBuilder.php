@@ -33,6 +33,7 @@ class KeycloakUrlBuilder
     public function __construct(string $baseUrl, ?string $realm)
     {
         $this->baseUrl = rtrim($baseUrl, '/');
+
         $this->realm = $realm;
     }
 
@@ -96,5 +97,15 @@ class KeycloakUrlBuilder
     public function getRoleByNameUrl(string $roleName): string
     {
         return "{$this->baseUrl}/admin/realms/{$this->realm}/roles/{$roleName}";
+    }
+
+    /**
+     * Get the URL for role mappings in the realm.
+     *
+     * @param $userId
+     * @return string
+     */
+    public function getRealmRoleMappingsUrl($userId): string {
+        return "{$this->baseUrl}/admin/realms/{$this->realm}/users/{$userId}/role-mappings/realm";
     }
 }

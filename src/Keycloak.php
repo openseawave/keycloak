@@ -4,11 +4,15 @@ namespace OpenSeaWave\Keycloak;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use OpenSeaWave\Keycloak\Enums\CredentialType;
+use OpenSeaWave\Keycloak\Enums\GrantType;
 use OpenSeaWave\Keycloak\Representation\AddUserRolesRequest;
 use OpenSeaWave\Keycloak\Representation\CreateRoleRequest;
+use OpenSeaWave\Keycloak\Representation\CredentialRepresentation;
 use OpenSeaWave\Keycloak\Representation\DeleteUserRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetUsersRequest;
+use OpenSeaWave\Keycloak\Representation\RoleRepresentation;
 use OpenSeaWave\Keycloak\Representation\UpdateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\UserRepresentation;
 use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
@@ -74,9 +78,9 @@ class Keycloak implements KeycloakInterface
     /**
      * The grant type.
      *
-     * @var ?string
+     * @var ?GrantType
      */
-    protected ?string $grantType;
+    protected ?GrantType $grantType;
 
     /**
      * KeycloakClient constructor.
@@ -136,12 +140,12 @@ class Keycloak implements KeycloakInterface
     }
 
     /**
-     * Set grant type for the Keycloak client.
+     * Set grantType for the Keycloak client.
      *
-     * @param string $grantType The grant type to set.
+     * @param GrantType $grantType The grant type to set.
      * @return Keycloak
      */
-    public function setGrantType(string $grantType): Keycloak
+    public function setGrantType(GrantType $grantType): Keycloak
     {
         $this->grantType = $grantType;
 
@@ -175,7 +179,7 @@ class Keycloak implements KeycloakInterface
     }
 
     /**
-     * Set username for the Keycloak client.
+     * Set a username for the Keycloak client.
      *
      * @param string $username The username to set.
      * @return Keycloak
@@ -188,7 +192,7 @@ class Keycloak implements KeycloakInterface
     }
 
     /**
-     * Set password for the Keycloak client.
+     * Set a password for the Keycloak client.
      *
      * @param string $password The password to set.
      * @return Keycloak
@@ -296,10 +300,10 @@ class Keycloak implements KeycloakInterface
      *
      * @param string $id The UUID of the user to retrieve.
      * @param ?string $realm The realm for which to retrieve the user.
-     * @return object A user representation.
+     * @return UserRepresentation A user representation.
      * @throws GuzzleException If the HTTP request fails.
      */
-    public function getUser(string $id,?string $realm = null): object
+    public function getUser(string $id,?string $realm = null): UserRepresentation
     {
         // Create a new instance of the KeycloakUrlBuilder
         $urlBuilder = new KeycloakUrlBuilder(
@@ -334,6 +338,7 @@ class Keycloak implements KeycloakInterface
         $users = $this->getUsers(
             realm: $realm,
             query: new GetUsersRequest(
+                exact: true,
                 username: $username
             )
         );
@@ -344,7 +349,7 @@ class Keycloak implements KeycloakInterface
         }
 
         // Return the user object
-        return $users[0];
+        return collect($users)->first();
     }
 
     /**
@@ -372,12 +377,16 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        // Return the user object
+        // Check if the response is successful
         if (!$this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to create user', 0);
         }
 
-        return $data;
+        // Return the user object
+        return $this->getUserByUsername(
+            username: $data->username,
+            realm: $realm ?? $this->realm
+        );
     }
 
     /**
@@ -436,10 +445,41 @@ class Keycloak implements KeycloakInterface
         ]);
 
         if (!$this->isSuccessfulResponse($response)) {
-            throw new KeycloakException('Failed to update user', 0);
+            throw new KeycloakException('Failed to delete user', 0);
         }
 
         return true;
+    }
+
+    /**
+     * Retrieve a role by name.
+     *
+     * @param string $roleName The role name of the role to retrieve.
+     * @param string|null $realm The realm for which to retrieve the role.
+     * @return RoleRepresentation A role representation.
+     * @throws GuzzleException
+     * @throws KeycloakException
+     */
+    public function getRoleByName(string $roleName, ?string $realm = null): RoleRepresentation
+    {
+        $urlBuilder = new KeycloakUrlBuilder(
+            baseUrl: $this->baseUrl,
+            realm: $realm ?? $this->realm
+        );
+
+        $response = $this->httpClient->get($urlBuilder->getRoleByNameUrl($roleName), [
+            'headers' => [
+                'Authorization' => "Bearer {$this->getToken()->access_token}",
+            ]
+        ]);
+
+        if (!$this->isSuccessfulResponse($response)) {
+            throw new KeycloakException('Failed to retrieve roles', 0);
+        }
+
+        return json_decode(
+            $response->getBody()->getContents()
+        );
     }
 
     /**
@@ -479,11 +519,11 @@ class Keycloak implements KeycloakInterface
      *
      * @param CreateRoleRequest $data The role data for creating a new role.
      * @param string|null $realm The realm for which to create the role.
-     * @return bool True if the role was created successfully.
+     * @return RoleRepresentation True if the role was created successfully.
      * @throws GuzzleException If the HTTP request fails.
      * @throws KeycloakException If the API request fails.
      */
-    public function createRole(CreateRoleRequest $data, ?string $realm = null): bool
+    public function createRole(CreateRoleRequest $data, ?string $realm = null): RoleRepresentation
     {
         $urlBuilder = new KeycloakUrlBuilder(
             baseUrl: $this->baseUrl,
@@ -501,82 +541,197 @@ class Keycloak implements KeycloakInterface
             throw new KeycloakException('Failed to create role', 0);
         }
 
+        return $this->getRoleByName(
+            roleName: $data->name,
+            realm: $realm ?? $this->realm
+        );
+    }
+
+    /**
+     *  Update an existing role in the realm.
+     *
+     * @param string $roleName
+     * @param UpdateRoleRequest $data
+     * @param string|null $realm
+     * @return bool
+     * @throws GuzzleException
+     * @throws KeycloakException
+     */
+    public function updateRole(string $roleName, UpdateRoleRequest $data, ?string $realm = null): bool
+    {
+        $urlBuilder = new KeycloakUrlBuilder(
+            baseUrl: $this->baseUrl,
+            realm: $realm ?? $this->realm
+        );
+
+        $response = $this->httpClient->put($urlBuilder->getRoleByNameUrl($roleName), [
+            'json' => $data,
+            'headers' => [
+                'Authorization' => "Bearer {$this->getToken()->access_token}",
+            ],
+        ]);
+
+        if (!$this->isSuccessfulResponse($response)) {
+            throw new KeycloakException('Failed to update role', 0);
+        }
+
         return true;
     }
 
     /**
+     *  Delete a role from the realm.
+     *
      * @param string $roleName
-     * @param UpdateRoleRequest $data
      * @param string|null $realm
-     * @return void
+     * @return bool
+     * @throws GuzzleException
+     * @throws KeycloakException
      */
-    public function updateRole(string $roleName, UpdateRoleRequest $data, ?string $realm = null): void
+    public function deleteRole(string $roleName,?string $realm = null): bool
     {
-        // TODO: Implement updateRole() method.
+        $urlBuilder = new KeycloakUrlBuilder(
+            baseUrl: $this->baseUrl,
+            realm: $realm ?? $this->realm
+        );
+
+        $response = $this->httpClient->delete($urlBuilder->getRoleByNameUrl($roleName), [
+            'headers' => [
+                'Authorization' => "Bearer {$this->getToken()->access_token}",
+            ],
+        ]);
+
+        if (!$this->isSuccessfulResponse($response)) {
+            throw new KeycloakException('Failed to delete role', 0);
+        }
+
+        return true;
     }
 
     /**
-     * @param string $roleName
-     * @param string|null $realm
-     * @return void
-     */
-    public function deleteRole(string $roleName,?string $realm = null): void
-    {
-        // TODO: Implement deleteRole() method.
-    }
-
-    /**
+     *  Retrieve a list of realm roles assigned to a user.
+     *
      * @param string $userId
      * @param ?string $realm
      * @return array
+     * @throws GuzzleException
      */
-    public function getUserRoles(string $userId,?string $realm = null): array
+    public function getUserRealmRoles(string $userId,?string $realm = null): array
     {
-        // TODO: Implement getUserRoles() method.
+        return $this->getUser(
+            $userId, $realm
+        )->realmRoles;
     }
 
     /**
+     *  Assign realm roles to a user
+     *
      * @param string $userId
      * @param AddUserRolesRequest $roles
      * @param string|null $realm
-     * @return void
+     * @return object
+     * @throws GuzzleException
+     * @throws KeycloakException
      */
-    public function addUserRoles(string $userId, AddUserRolesRequest $roles, ?string $realm = null): void
+    public function addUserRealmRoles(string $userId, AddUserRolesRequest $roles, ?string $realm = null): object
     {
-        // TODO: Implement addUserRoles() method.
+        $urlBuilder = new KeycloakUrlBuilder(
+            baseUrl: $this->baseUrl,
+            realm: $realm ?? $this->realm
+        );
+
+        $response = $this->httpClient->post($urlBuilder->getRealmRoleMappingsUrl($userId), [
+            'json' => $roles,
+            'headers' => [
+                'Authorization' => "Bearer {$this->getToken()->access_token}",
+            ],
+        ]);
+
+        if (!$this->isSuccessfulResponse($response)) {
+            throw new KeycloakException('Failed to assign roles', 0);
+        }
+
+        return json_decode(
+            $response->getBody()->getContents()
+        );
     }
 
     /**
+     *  Remove realm roles from a user.
+     *
      * @param string $userId
      * @param DeleteUserRolesRequest $roles
      * @param string|null $realm
-     * @return void
+     * @return bool
+     * @throws GuzzleException
+     * @throws KeycloakException
      */
-    public function deleteUserRoles(string $userId, DeleteUserRolesRequest $roles, ?string $realm = null): void
+    public function deleteUserRealmRoles(string $userId, DeleteUserRolesRequest $roles, ?string $realm = null): bool
     {
-        // TODO: Implement deleteUserRoles() method.
+        $urlBuilder = new KeycloakUrlBuilder(
+            baseUrl: $this->baseUrl,
+            realm: $realm ?? $this->realm
+        );
+
+        $response = $this->httpClient->delete($urlBuilder->getRealmRoleMappingsUrl($userId), [
+            'json' => $roles,
+            'headers' => [
+                'Authorization' => "Bearer {$this->getToken()->access_token}",
+            ],
+        ]);
+
+        if (!$this->isSuccessfulResponse($response)) {
+            throw new KeycloakException('Failed to remove roles', 0);
+        }
+
+        return true;
     }
 
     /**
+     * Change a user's password.
+     *
      * @param string $userId
      * @param string $password
      * @param string|null $realm
      * @return void
+     * @throws GuzzleException
+     * @throws KeycloakException
      */
     public function changeUserPassword(string $userId, string $password,?string $realm = null): void
     {
-        // TODO: Implement changeUserPassword() method.
+        $this->updateUser(
+            $userId,
+            new UserRepresentation(
+                credentials: [
+                    new CredentialRepresentation(
+                        type: CredentialType::PASSWORD,
+                        value: $password,
+                        temporary: false
+                    )
+                ]
+            ),
+            $realm
+        );
     }
 
     /**
+     *  Change a user's activation status.
+     *
      * @param string $userId
      * @param bool $enabled
      * @param string|null $realm
      * @return void
+     * @throws GuzzleException
+     * @throws KeycloakException
      */
     public function changeUserActivationStatus(string $userId, bool $enabled,?string $realm = null): void
     {
-        // TODO: Implement changeUserActivationStatus() method.
+        $this->updateUser(
+            $userId,
+            new UserRepresentation(
+                enabled: $enabled
+            ),
+            $realm
+        );
     }
 
     /**
