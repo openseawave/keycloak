@@ -6,7 +6,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use OpenSeaWave\Keycloak\Enums\CredentialType;
 use OpenSeaWave\Keycloak\Enums\GrantType;
+use OpenSeaWave\Keycloak\Exceptions\KeycloakException;
 use OpenSeaWave\Keycloak\Representation\AddUserRolesRequest;
+use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
 use OpenSeaWave\Keycloak\Representation\CreateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\CredentialRepresentation;
 use OpenSeaWave\Keycloak\Representation\DeleteUserRolesRequest;
@@ -15,70 +17,51 @@ use OpenSeaWave\Keycloak\Representation\GetUsersRequest;
 use OpenSeaWave\Keycloak\Representation\RoleRepresentation;
 use OpenSeaWave\Keycloak\Representation\UpdateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\UserRepresentation;
-use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
-use OpenSeaWave\Keycloak\Exceptions\KeycloakException;
 
 /**
  * Keycloak class.
  *
- * @package OpenSeaWave\Keycloak
  * @author  Omar Haris
  */
 class Keycloak implements KeycloakInterface
 {
     /**
      * The HTTP client instance.
-     *
-     * @var Client
      */
     protected Client $httpClient;
 
     /**
      * The base URL for Keycloak.
-     *
-     * @var string
      */
     private string $baseUrl;
 
     /**
      * The username for the keycloak admin.
-     *
-     * @var ?string
      */
     private ?string $username;
 
     /**
      * The password for the keycloak admin.
-     *
-     * @var ?string
      */
     private ?string $password;
 
     /**
      * The realm for which requests are made.
-     *
-     * @var ?string
      */
     private ?string $realm;
 
     /**
      * The client ID.
-     *
-     * @var ?string
      */
     protected ?string $clientId;
 
     /**
      * The client secret.
-     *
-     * @var ?string
      */
     protected ?string $clientSecret;
 
     /**
      * The grant type.
-     *
-     * @var ?GrantType
      */
     protected ?GrantType $grantType;
 
@@ -95,8 +78,7 @@ class Keycloak implements KeycloakInterface
         ?string $clientId = null,
         ?string $clientSecret = null,
         ?string $grantType = null
-    )
-    {
+    ) {
         $this->username = $username ?? config('keycloak.username');
         $this->password = $password ?? config('keycloak.password');
         $this->baseUrl = $baseUrl ?? config('keycloak.base_url');
@@ -109,15 +91,14 @@ class Keycloak implements KeycloakInterface
             'base_uri' => $this->baseUrl,
             'headers' => [
                 'Content-Type' => 'application/json',
-            ]
+            ],
         ]);
     }
 
     /**
      * Set base URL for the Keycloak client.
      *
-     * @param string $baseUrl The base URL to set.
-     * @return Keycloak
+     * @param  string  $baseUrl  The base URL to set.
      */
     public function setBaseUrl(string $baseUrl): Keycloak
     {
@@ -129,8 +110,7 @@ class Keycloak implements KeycloakInterface
     /**
      * Set realm for the Keycloak client.
      *
-     * @param string $realm The realm to set.
-     * @return Keycloak
+     * @param  string  $realm  The realm to set.
      */
     public function setRealm(string $realm): Keycloak
     {
@@ -142,8 +122,7 @@ class Keycloak implements KeycloakInterface
     /**
      * Set grantType for the Keycloak client.
      *
-     * @param GrantType $grantType The grant type to set.
-     * @return Keycloak
+     * @param  GrantType  $grantType  The grant type to set.
      */
     public function setGrantType(GrantType $grantType): Keycloak
     {
@@ -155,8 +134,7 @@ class Keycloak implements KeycloakInterface
     /**
      * Set Client ID for the Keycloak client.
      *
-     * @param string $clientId The client ID to set.
-     * @return Keycloak
+     * @param  string  $clientId  The client ID to set.
      */
     public function setClientId(string $clientId): Keycloak
     {
@@ -168,8 +146,7 @@ class Keycloak implements KeycloakInterface
     /**
      * Set Client secret for the Keycloak client.
      *
-     * @param string $clientSecret The client secret to set.
-     * @return Keycloak
+     * @param  string  $clientSecret  The client secret to set.
      */
     public function setClientSecret(string $clientSecret): Keycloak
     {
@@ -181,8 +158,7 @@ class Keycloak implements KeycloakInterface
     /**
      * Set a username for the Keycloak client.
      *
-     * @param string $username The username to set.
-     * @return Keycloak
+     * @param  string  $username  The username to set.
      */
     public function setUsername(string $username): Keycloak
     {
@@ -194,8 +170,7 @@ class Keycloak implements KeycloakInterface
     /**
      * Set a password for the Keycloak client.
      *
-     * @param string $password The password to set.
-     * @return Keycloak
+     * @param  string  $password  The password to set.
      */
     public function setPassword(string $password): Keycloak
     {
@@ -207,8 +182,9 @@ class Keycloak implements KeycloakInterface
     /**
      * Retrieve an access token from Keycloak.
      *
-     * @param ?string $realm The realm for which to retrieve the token.
+     * @param  ?string  $realm  The realm for which to retrieve the token.
      * @return object the token object.
+     *
      * @throws GuzzleException If the HTTP request fails.
      */
     public function getToken(?string $realm = null): object
@@ -239,12 +215,13 @@ class Keycloak implements KeycloakInterface
     /**
      * Count the total number of users in a realm based on filters.
      *
-     * @param ?CountUsersRequest $query An object representing the query parameters.
-     * @param ?string $realm The realm for which to count users.
+     * @param  ?CountUsersRequest  $query  An object representing the query parameters.
+     * @param  ?string  $realm  The realm for which to count users.
      * @return int The number of users matching the criteria.
+     *
      * @throws GuzzleException If the HTTP request fails.
      */
-    public function countUsers(?string $realm = null,?CountUsersRequest $query = null): int
+    public function countUsers(?string $realm = null, ?CountUsersRequest $query = null): int
     {
         // Create a new instance of the KeycloakUrlBuilder
         $urlBuilder = new KeycloakUrlBuilder(
@@ -269,12 +246,13 @@ class Keycloak implements KeycloakInterface
     /**
      * Retrieve a list of users based on filters.
      *
-     * @param ?GetUsersRequest $query An object representing the query parameters.
-     * @param ?string $realm The realm for which to retrieve users.
+     * @param  ?GetUsersRequest  $query  An object representing the query parameters.
+     * @param  ?string  $realm  The realm for which to retrieve users.
      * @return array An array of user objects.
+     *
      * @throws GuzzleException If the HTTP request fails.
      */
-    public function getUsers(?string $realm = null,?GetUsersRequest $query = null): array
+    public function getUsers(?string $realm = null, ?GetUsersRequest $query = null): array
     {
         // Create a new instance of the KeycloakUrlBuilder
         $urlBuilder = new KeycloakUrlBuilder(
@@ -287,7 +265,7 @@ class Keycloak implements KeycloakInterface
             'headers' => [
                 'Authorization' => "Bearer {$this->getToken()->access_token}",
             ],
-            'query' => $query?->toArray()
+            'query' => $query?->toArray(),
         ]);
 
         return json_decode(
@@ -298,12 +276,13 @@ class Keycloak implements KeycloakInterface
     /**
      * Retrieve user details by user ID.
      *
-     * @param string $id The UUID of the user to retrieve.
-     * @param ?string $realm The realm for which to retrieve the user.
+     * @param  string  $id  The UUID of the user to retrieve.
+     * @param  ?string  $realm  The realm for which to retrieve the user.
      * @return UserRepresentation A user representation.
+     *
      * @throws GuzzleException If the HTTP request fails.
      */
-    public function getUser(string $id,?string $realm = null): UserRepresentation
+    public function getUser(string $id, ?string $realm = null): UserRepresentation
     {
         // Create a new instance of the KeycloakUrlBuilder
         $urlBuilder = new KeycloakUrlBuilder(
@@ -327,12 +306,13 @@ class Keycloak implements KeycloakInterface
     /**
      * Retrieve user details by username.
      *
-     * @param string $username The username of the user to retrieve.
-     * @param ?string $realm The realm for which to retrieve the user.
+     * @param  string  $username  The username of the user to retrieve.
+     * @param  ?string  $realm  The realm for which to retrieve the user.
      * @return object A user representation.
+     *
      * @throws GuzzleException|KeycloakException If the HTTP request fails.
      */
-    public function getUserByUsername(string $username,?string $realm = null): object
+    public function getUserByUsername(string $username, ?string $realm = null): object
     {
         // Retrieve the user by username
         $users = $this->getUsers(
@@ -344,7 +324,7 @@ class Keycloak implements KeycloakInterface
         );
 
         // Throw an exception if the user is not found
-        if(count($users) === 0) {
+        if (count($users) === 0) {
             throw new KeycloakException('User not found', 0);
         }
 
@@ -355,9 +335,10 @@ class Keycloak implements KeycloakInterface
     /**
      * Create a new user in the realm.
      *
-     * @param UserRepresentation $data The user data for creating a new user.
-     * @param ?string $realm The realm for which to create the user.
+     * @param  UserRepresentation  $data  The user data for creating a new user.
+     * @param  ?string  $realm  The realm for which to create the user.
      * @return UserRepresentation The user object that was created.
+     *
      * @throws KeycloakException If the API request fails.
      * @throws GuzzleException
      */
@@ -378,7 +359,7 @@ class Keycloak implements KeycloakInterface
         ]);
 
         // Check if the response is successful
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to create user', 0);
         }
 
@@ -392,9 +373,10 @@ class Keycloak implements KeycloakInterface
     /**
      * Update an existing user in the realm.
      *
-     * @param UserRepresentation $data The user data for creating a new user.
-     * @param ?string $realm The realm for which to create the user.
+     * @param  UserRepresentation  $data  The user data for creating a new user.
+     * @param  ?string  $realm  The realm for which to create the user.
      * @return UserRepresentation The user object that was created.
+     *
      * @throws KeycloakException If the API request fails.
      * @throws GuzzleException
      */
@@ -415,7 +397,7 @@ class Keycloak implements KeycloakInterface
         ]);
 
         // Return the user object
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to update user', 0);
         }
 
@@ -425,13 +407,14 @@ class Keycloak implements KeycloakInterface
     /**
      * Delete a user in the realm.
      *
-     * @param string $id The UUID of the user to delete.
-     * @param string|null $realm The realm for which to delete the user.
+     * @param  string  $id  The UUID of the user to delete.
+     * @param  string|null  $realm  The realm for which to delete the user.
      * @return bool True if the user was deleted successfully.
+     *
      * @throws GuzzleException If the HTTP request fails.
      * @throws KeycloakException If the API request fails.
      */
-    public function deleteUser(string $id,?string $realm = null): bool
+    public function deleteUser(string $id, ?string $realm = null): bool
     {
         $urlBuilder = new KeycloakUrlBuilder(
             baseUrl: $this->baseUrl,
@@ -444,7 +427,7 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to delete user', 0);
         }
 
@@ -454,9 +437,10 @@ class Keycloak implements KeycloakInterface
     /**
      * Retrieve a role by name.
      *
-     * @param string $roleName The role name of the role to retrieve.
-     * @param string|null $realm The realm for which to retrieve the role.
+     * @param  string  $roleName  The role name of the role to retrieve.
+     * @param  string|null  $realm  The realm for which to retrieve the role.
      * @return RoleRepresentation A role representation.
+     *
      * @throws GuzzleException
      * @throws KeycloakException
      */
@@ -470,10 +454,10 @@ class Keycloak implements KeycloakInterface
         $response = $this->httpClient->get($urlBuilder->getRoleByNameUrl($roleName), [
             'headers' => [
                 'Authorization' => "Bearer {$this->getToken()->access_token}",
-            ]
+            ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to retrieve roles', 0);
         }
 
@@ -485,13 +469,14 @@ class Keycloak implements KeycloakInterface
     /**
      *  Retrieve a list of roles from the realm.
      *
-     * @param string|null $realm The realm for which to retrieve roles.
-     * @param GetRolesRequest|null $request An object representing the query parameters.
+     * @param  string|null  $realm  The realm for which to retrieve roles.
+     * @param  GetRolesRequest|null  $request  An object representing the query parameters.
      * @return array An array of role objects.
+     *
      * @throws GuzzleException If the HTTP request fails.
      * @throws KeycloakException If the API request fails.
      */
-    public function getRoles(?GetRolesRequest $request,string $realm = null): array
+    public function getRoles(?GetRolesRequest $request, ?string $realm = null): array
     {
         $urlBuilder = new KeycloakUrlBuilder(
             baseUrl: $this->baseUrl,
@@ -502,10 +487,10 @@ class Keycloak implements KeycloakInterface
             'headers' => [
                 'Authorization' => "Bearer {$this->getToken()->access_token}",
             ],
-            'query' => $request?->toArray()
+            'query' => $request?->toArray(),
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to retrieve roles', 0);
         }
 
@@ -517,9 +502,10 @@ class Keycloak implements KeycloakInterface
     /**
      * Create a new role in the realm.
      *
-     * @param CreateRoleRequest $data The role data for creating a new role.
-     * @param string|null $realm The realm for which to create the role.
+     * @param  CreateRoleRequest  $data  The role data for creating a new role.
+     * @param  string|null  $realm  The realm for which to create the role.
      * @return RoleRepresentation True if the role was created successfully.
+     *
      * @throws GuzzleException If the HTTP request fails.
      * @throws KeycloakException If the API request fails.
      */
@@ -537,7 +523,7 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to create role', 0);
         }
 
@@ -550,10 +536,6 @@ class Keycloak implements KeycloakInterface
     /**
      *  Update an existing role in the realm.
      *
-     * @param string $roleName
-     * @param UpdateRoleRequest $data
-     * @param string|null $realm
-     * @return bool
      * @throws GuzzleException
      * @throws KeycloakException
      */
@@ -571,7 +553,7 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to update role', 0);
         }
 
@@ -581,13 +563,10 @@ class Keycloak implements KeycloakInterface
     /**
      *  Delete a role from the realm.
      *
-     * @param string $roleName
-     * @param string|null $realm
-     * @return bool
      * @throws GuzzleException
      * @throws KeycloakException
      */
-    public function deleteRole(string $roleName,?string $realm = null): bool
+    public function deleteRole(string $roleName, ?string $realm = null): bool
     {
         $urlBuilder = new KeycloakUrlBuilder(
             baseUrl: $this->baseUrl,
@@ -600,7 +579,7 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to delete role', 0);
         }
 
@@ -610,12 +589,9 @@ class Keycloak implements KeycloakInterface
     /**
      *  Retrieve a list of realm roles assigned to a user.
      *
-     * @param string $userId
-     * @param ?string $realm
-     * @return array
      * @throws GuzzleException
      */
-    public function getUserRealmRoles(string $userId,?string $realm = null): array
+    public function getUserRealmRoles(string $userId, ?string $realm = null): array
     {
         return $this->getUser(
             $userId, $realm
@@ -625,10 +601,6 @@ class Keycloak implements KeycloakInterface
     /**
      *  Assign realm roles to a user
      *
-     * @param string $userId
-     * @param AddUserRolesRequest $roles
-     * @param string|null $realm
-     * @return object
      * @throws GuzzleException
      * @throws KeycloakException
      */
@@ -646,7 +618,7 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to assign roles', 0);
         }
 
@@ -658,10 +630,6 @@ class Keycloak implements KeycloakInterface
     /**
      *  Remove realm roles from a user.
      *
-     * @param string $userId
-     * @param DeleteUserRolesRequest $roles
-     * @param string|null $realm
-     * @return bool
      * @throws GuzzleException
      * @throws KeycloakException
      */
@@ -679,7 +647,7 @@ class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if (!$this->isSuccessfulResponse($response)) {
+        if (! $this->isSuccessfulResponse($response)) {
             throw new KeycloakException('Failed to remove roles', 0);
         }
 
@@ -689,14 +657,10 @@ class Keycloak implements KeycloakInterface
     /**
      * Change a user's password.
      *
-     * @param string $userId
-     * @param string $password
-     * @param string|null $realm
-     * @return void
      * @throws GuzzleException
      * @throws KeycloakException
      */
-    public function changeUserPassword(string $userId, string $password,?string $realm = null): void
+    public function changeUserPassword(string $userId, string $password, ?string $realm = null): void
     {
         $this->updateUser(
             $userId,
@@ -706,7 +670,7 @@ class Keycloak implements KeycloakInterface
                         type: CredentialType::PASSWORD,
                         value: $password,
                         temporary: false
-                    )
+                    ),
                 ]
             ),
             $realm
@@ -716,14 +680,10 @@ class Keycloak implements KeycloakInterface
     /**
      *  Change a user's activation status.
      *
-     * @param string $userId
-     * @param bool $enabled
-     * @param string|null $realm
-     * @return void
      * @throws GuzzleException
      * @throws KeycloakException
      */
-    public function changeUserActivationStatus(string $userId, bool $enabled,?string $realm = null): void
+    public function changeUserActivationStatus(string $userId, bool $enabled, ?string $realm = null): void
     {
         $this->updateUser(
             $userId,
@@ -736,13 +696,9 @@ class Keycloak implements KeycloakInterface
 
     /**
      * Check if the response is successful.
-     *
-     * @param $response
-     * @return bool
      */
     private function isSuccessfulResponse($response): bool
     {
         return $response->getStatusCode() === 201 || $response->getStatusCode() === 200 || $response->getStatusCode() === 204 || $response->getStatusCode() === 202;
     }
 }
-
