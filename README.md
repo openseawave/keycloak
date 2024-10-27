@@ -27,12 +27,13 @@ you can use it like this:
 
 ```php
 use Openseawave\Keycloak\Keycloak;
+use OpenSeaWave\Keycloak\Enums\GrantType;
 
 $keycloak = new Keycloak(
     baseUrl: 'http://localhost:8080',
     username: 'admin',
     password: 'admin',
-    grantType: 'password',
+    grantType: GrantType::PASSWORD,
     clientId: 'admin-cli',
 );
 
