@@ -5,7 +5,6 @@ namespace OpenSeaWave\Keycloak\Enums;
 /**
  * Class GrantType
  *
- * @package OpenSeaWave\Keycloak\Enums
  * @author  Omar Haris
  */
 enum GrantType: string
