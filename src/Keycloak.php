@@ -37,7 +37,7 @@ class Keycloak implements KeycloakInterface
          *
          * @var Client
          */
-        private Client $httpClient,
+        private ?Client $httpClient,
 
         /**
          * The base URL for Keycloak.
