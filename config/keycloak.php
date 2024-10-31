@@ -14,7 +14,7 @@ return [
     | Keycloak instance is accessible.
     |
     */
-    'base_url' => env('KEYCLOAK_BASE_URL','http://localhost:8080'),
+    'base_url' => env('KEYCLOAK_BASE_URL', 'http://localhost:8080'),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ return [
     | the Keycloak API.
     |
     */
-    'username' => env('KEYCLOAK_USERNAME','admin'),
+    'username' => env('KEYCLOAK_USERNAME', 'admin'),
 
     /*
     |--------------------------------------------------------------------------
@@ -48,7 +48,7 @@ return [
     | application will communicate with.
     |
     */
-    'realm' => env('KEYCLOAK_REALM','master'),
+    'realm' => env('KEYCLOAK_REALM', 'master'),
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ return [
     | realm to allow API interactions.
     |
     */
-    'client_id' => env('KEYCLOAK_CLIENT_ID','admin-cli'),
+    'client_id' => env('KEYCLOAK_CLIENT_ID', 'admin-cli'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,5 +84,5 @@ return [
     | method. Other grant types are available, such as 'client_credentials'.
     |
     */
-    'grant_type' => env('KEYCLOAK_GRANT_TYPE','password'),
+    'grant_type' => env('KEYCLOAK_GRANT_TYPE', 'password'),
 ];

@@ -8,7 +8,6 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 /**
  * KeycloakServiceProvider service provider class.
  *
- * @package OpenSeaWave\Keycloak
  * @author  Omar Haris
  */
 class KeycloakServiceProvider extends PackageServiceProvider
