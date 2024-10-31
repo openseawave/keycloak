@@ -5,13 +5,13 @@ namespace OpenSeaWave\Keycloak\Facades;
 use Illuminate\Support\Facades\Facade;
 use OpenSeaWave\Keycloak\Enums\GrantType;
 use OpenSeaWave\Keycloak\Representation\AddUserRolesRequest;
+use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
 use OpenSeaWave\Keycloak\Representation\CreateRoleRequest;
 use OpenSeaWave\Keycloak\Representation\DeleteUserRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetRolesRequest;
 use OpenSeaWave\Keycloak\Representation\GetUsersRequest;
 use OpenSeaWave\Keycloak\Representation\RoleRepresentation;
 use OpenSeaWave\Keycloak\Representation\UserRepresentation;
-use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
 
 /**
  * Class Keycloak
@@ -42,15 +42,13 @@ use OpenSeaWave\Keycloak\Representation\CountUsersRequest;
  * @method static void changeUserActivationStatus(string $userId, bool $enabled,?string $realm) Change a user's activation status.
  *
  * @see \OpenSeaWave\Keycloak\Keycloak
- * @package OpenSeaWave\Keycloak
+ *
  * @author  Omar Haris
  */
 class Keycloak extends Facade
 {
     /**
      * Get the registered name of the component.
-     *
-     * @return string
      */
     protected static function getFacadeAccessor(): string
     {

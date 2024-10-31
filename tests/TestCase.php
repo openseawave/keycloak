@@ -3,8 +3,8 @@
 namespace OpenSeaWave\Keycloak\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use OpenSeaWave\Keycloak\KeycloakServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
