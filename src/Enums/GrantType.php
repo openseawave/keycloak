@@ -5,7 +5,6 @@ namespace OpenSeaWave\Keycloak\Enums;
 /**
  * Class GrantType
  *
- * @package OpenSeaWave\Keycloak\Enums
  * @author  Omar Haris
  */
 enum GrantType: string
@@ -23,7 +22,7 @@ enum GrantType: string
     /**
      * Retrieve a GrantType instance from its name.
      *
-     * @param string $name The name of the grant type.
+     * @param  string  $name  The name of the grant type.
      * @return GrantType The corresponding GrantType instance.
      */
     public static function fromName(string $name): GrantType
