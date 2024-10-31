@@ -27,66 +27,82 @@ use OpenSeaWave\Keycloak\Exceptions\KeycloakException;
 class Keycloak implements KeycloakInterface
 {
     /**
+     * The HTTP client instance.
+     *
+     * @var Client
+     */
+    private ?Client $httpClient = null;
+
+    /**
+     * The base URL for Keycloak.
+     *
+     * @var string
+     */
+    public ?string $baseUrl = null;
+
+    /**
+     * The realm for which requests are made.
+     *
+     * @var ?string
+     */
+    public ?string $realm = null;
+
+    /**
+     * The username for the keycloak admin.
+     *
+     * @var ?string
+     */
+    public ?string $username = null;
+
+    /**
+     * The password for the keycloak admin.
+     *
+     * @var ?string
+     */
+    public ?string $password = null;
+
+    /**
+     * The client ID.
+     *
+     * @var ?string
+     */
+    public ?string $clientId = null;
+
+    /**
+     * The client secret.
+     *
+     * @var ?string
+     */
+    public ?string $clientSecret = null;
+
+    /**
+     * The grant type.
+     *
+     * @var ?GrantType
+     */
+    public ?GrantType $grantType = null;
+
+    /**
      * KeycloakClient constructor.
      *
      * Initializes the HTTP client and retrieves the access token.
+     *
+     * @param string|null $baseUrl The base URL of the Keycloak server.
+     * @param string|null $realm The realm to be used for the API calls.
+     * @param string|null $username The username for the Keycloak admin.
+     * @param string|null $password The password for the Keycloak admin.
+     * @param string|null $clientId The client ID.
+     * @param string|null $clientSecret The client secret.
+     *
      */
     public function __construct(
-        /**
-         * The HTTP client instance.
-         *
-         * @var Client
-         */
-        private ?Client $httpClient,
-
-        /**
-         * The base URL for Keycloak.
-         *
-         * @var string
-         */
-        public ?string $baseUrl,
-
-        /**
-         * The realm for which requests are made.
-         *
-         * @var ?string
-         */
-        public ?string $realm,
-
-        /**
-         * The username for the keycloak admin.
-         *
-         * @var ?string
-         */
-        public ?string $username,
-
-        /**
-         * The password for the keycloak admin.
-         *
-         * @var ?string
-         */
-        public ?string $password,
-
-        /**
-         * The client ID.
-         *
-         * @var ?string
-         */
-        public ?string $clientId,
-
-        /**
-         * The client secret.
-         *
-         * @var ?string
-         */
-        public ?string $clientSecret = null,
-
-        /**
-         * The grant type.
-         *
-         * @var ?GrantType
-         */
-        public ?GrantType $grantType = null
+        ?string $baseUrl = null,
+        ?string $realm = null,
+        ?string $username = null,
+        ?string $password = null,
+        ?string $clientId = null,
+        ?string $clientSecret = null,
+        ?GrantType $grantType = null
     )
     {
         $this->username = $username ?? config('keycloak.username');
@@ -95,7 +111,10 @@ class Keycloak implements KeycloakInterface
         $this->realm = $realm ?? config('keycloak.realm');
         $this->clientId = $clientId ?? config('keycloak.client_id');
         $this->clientSecret = $clientSecret ?? config('keycloak.client_secret');
-        $this->grantType = $grantType ?? config('keycloak.grant_type');
+
+        $this->grantType = $grantType ?? GrantType::fromName(
+            config('keycloak.grant_type')
+        );
 
         $this->httpClient = new Client([
             'base_uri' => $this->baseUrl,
